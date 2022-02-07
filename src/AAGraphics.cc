@@ -4,7 +4,7 @@
 //                 Zachary Seth Hartwig : All rights reserved                  //
 //                                                                             //
 //      The ADAQAcquisition source code is licensed under the GNU GPL v3.0.    //
-//      You have the right to modify and/or redistribute this source code      //      
+//      You have the right to modify and/or redistribute this source code      //
 //      under the terms specified in the license, which may be found online    //
 //      at http://www.gnu.org/licenses or at $ADAQACQUISITION/License.txt.     //
 //                                                                             //
@@ -54,14 +54,14 @@ AAGraphics::AAGraphics()
 
   // Set the default palette used to color the PSDHistogram
   gStyle->SetPalette(kBird);
-  
+
   // Fill a vector with channel colors for plotting
   ChColor +=
     kBlue, kViolet+1, kMagenta, kPink+1,
     kRed, kOrange+2, kGreen+1, kCyan+1,
     kBlue+2, kViolet+2, kMagenta+2, kPink+3,
     kRed+2, kOrange+3, kGreen+3, kCyan+3;
-  
+
   // Get the number of digitizer channels
   const Int_t NumDGChannels = 16;//AAVMEManager::GetInstance()->GetDGManager()->GetNumChannels();
 
@@ -76,15 +76,15 @@ AAGraphics::AAGraphics()
     ZLE_L[ch]->SetLineColor(ChColor[ch]);
     ZLE_L[ch]->SetLineStyle(10);
     ZLE_L[ch]->SetLineWidth(2);
-    
+
     Baseline_B.push_back(new TBox);
     Baseline_B[ch]->SetFillColor(ChColor[ch]);
     Baseline_B[ch]->SetFillStyle(3002);
     Baseline_B[ch]->SetLineWidth(0);
-    
+
     BaselineStart.push_back(0);
     BaselineStop.push_back(1);
-    
+
     PSDTotal_B.push_back(new TBox);
     PSDTotal_B[ch]->SetFillColor(ChColor[ch]);
     PSDTotal_B[ch]->SetFillStyle(3002);
@@ -103,7 +103,7 @@ AAGraphics::AAGraphics()
     PSDTail_L0[ch]->SetLineColor(ChColor[ch]);
     PSDTail_L0[ch]->SetLineStyle(1);
     PSDTail_L0[ch]->SetLineWidth(2);
-    
+
     PSDTail_L1.push_back(new TLine);
     PSDTail_L1[ch]->SetLineColor(ChColor[ch]);
     PSDTail_L1[ch]->SetLineStyle(1);
@@ -113,10 +113,10 @@ AAGraphics::AAGraphics()
     PSDTriggerHoldoff_L[ch]->SetLineColor(ChColor[ch]);
     PSDTriggerHoldoff_L[ch]->SetLineStyle(7);
     PSDTriggerHoldoff_L[ch]->SetLineWidth(2);
-    
+
     WaveformGraphs.push_back(new TGraph);
   }
-  
+
   SpectrumCalibration_L = new TLine;
   SpectrumCalibration_L->SetLineColor(kRed);
   SpectrumCalibration_L->SetLineStyle(7);
@@ -126,16 +126,16 @@ AAGraphics::AAGraphics()
 
   Waveform_LG = new TLegend(0.85, 0.4, 0.95, 0.92);
   Waveform_LG->SetTextSize(0.04);
-  
+
   for(Int_t ch=0; ch<NumDGChannels; ch++){
     TLine *Line = new TLine;
     Line->SetLineColor(ChColor[ch]);
     Line->SetLineWidth(4);
-    
+
     stringstream SS;
     SS << "Ch" << ch;
     string LineName = SS.str();
-    
+
     Waveform_LG->AddEntry(Line, LineName.c_str(), "L");
   }
 
@@ -170,25 +170,25 @@ void AAGraphics::SetupWaveformGraphics(vector<Int_t> &WaveformLength)
   // STD firmware: baseline width, position set in absolute sample numbes
   // PSD firwmare: baseline width set by user in fixed samples; position in
   //               time is relative to pregate setting
-  
+
   Int_t NumDGChannels = DGManager->GetNumChannels();
-  
+
   for(Int_t ch=0; ch<DGManager->GetNumChannels(); ch++){
-    
+
     if(TheSettings->STDFirmware){
       BaselineStart[ch] = TheSettings->ChBaselineCalcMin[ch];
       BaselineStop[ch] = TheSettings->ChBaselineCalcMax[ch];
     }
     else if(TheSettings->PSDFirmware){
-      
+
       Int_t BaselineSamples = 0;
       Int_t BaselineSelection = TheSettings->ChBaselineSamples[ch];
-      
+
       ZBoardType DGType = AAVMEManager::GetInstance()->GetDGManager()->GetBoardType();
-      
+
       if(DGType == zV1720 or DGType == zDT5720 or
 	 DGType == zDT5790M or DGType == zDT5790N or DGType == zDT5790P){
-	  
+
 	switch(BaselineSelection){
 	case 1:
 	  BaselineSamples = 8;
@@ -204,7 +204,7 @@ void AAGraphics::SetupWaveformGraphics(vector<Int_t> &WaveformLength)
 	}
       }
       else if(DGType == zV1725 or DGType == zDT5730){
-	  
+
 	switch(BaselineSelection){
 	case 1:
 	  BaselineSamples = 16;
@@ -230,12 +230,12 @@ void AAGraphics::SetupWaveformGraphics(vector<Int_t> &WaveformLength)
   Time.clear();
   for(int t=0; t<MaxWaveformLength; t++)
     Time.push_back(t);
-  
+
   if(TheSettings->DisplayTitlesEnable){
     Title = TheSettings->DisplayTitle;
     XTitle = TheSettings->DisplayXTitle;
     YTitle = TheSettings->DisplayYTitle;
-    
+
     XSize = TheSettings->DisplayXTitleSize;
     XOffset = TheSettings->DisplayXTitleOffset;
 
@@ -246,7 +246,7 @@ void AAGraphics::SetupWaveformGraphics(vector<Int_t> &WaveformLength)
     Title = "Digitized waveform";
     XTitle = "Time [sample]";
     YTitle = "Voltage [ADC]";
-    
+
     XSize = YSize = 0.05;
     XOffset = 1.1;
     YOffset = 1.2;
@@ -261,19 +261,19 @@ void AAGraphics::SetupWaveformGraphics(vector<Int_t> &WaveformLength)
   // 0. Previous TGraph objects are deleted to prevent memory leak
   // 1. New TGraph objects are created for all channels
   // 3. Static graphical attributes are set for each channel's TGraph
-  
+
   vector<TGraph *>::iterator it = WaveformGraphs.begin();
   for(; it!=WaveformGraphs.end(); it++)
     delete (*it);
-  
+
   WaveformGraphs.clear();
   WaveformGraphs.resize(NumDGChannels);
-  
+
   for(Int_t ch=0; ch<NumDGChannels; ch++){
-    
+
     // Create a new TGraph representing the waveform
     WaveformGraphs[ch] = new TGraph;
-    
+
     // Set the static waveform graphical options
     WaveformGraphs[ch]->SetLineColor(ChColor[ch]);
     WaveformGraphs[ch]->SetLineWidth(WaveformWidth);
@@ -282,25 +282,25 @@ void AAGraphics::SetupWaveformGraphics(vector<Int_t> &WaveformLength)
     WaveformGraphs[ch]->SetMarkerColor(ChColor[ch]);
     WaveformGraphs[ch]->SetFillColor(ChColor[ch]);
   }
-  
+
   // Delete and recreate a TH1F object that is used to create the X
   // and Y axes for plotting the waveforms. The title/xtitle/ytitle
   // and other graphical options should be set here.
-  
+
   delete WaveformGraphAxes_H;
   WaveformGraphAxes_H = new TH1F("WaveformGraphAxes_H",
 				 "A TH1F used to create X and Y axes for waveform plotting",
 				 100, 0, MaxWaveformLength);
-  
+
   // Set the waveform title and axes properties
   WaveformGraphAxes_H->SetTitle(Title.c_str());
-  
+
   WaveformGraphAxes_H->GetXaxis()->SetTitle(XTitle.c_str());
   WaveformGraphAxes_H->GetXaxis()->SetTitleSize(XSize);
   WaveformGraphAxes_H->GetXaxis()->SetTitleOffset(XOffset);
   WaveformGraphAxes_H->GetXaxis()->SetLabelSize(XSize);
   WaveformGraphAxes_H->GetXaxis()->SetRangeUser(0, MaxWaveformLength);
-  
+
   WaveformGraphAxes_H->GetYaxis()->SetTitle(YTitle.c_str());
   WaveformGraphAxes_H->GetYaxis()->SetTitleSize(YSize);
   WaveformGraphAxes_H->GetYaxis()->SetTitleOffset(YOffset);
@@ -310,18 +310,18 @@ void AAGraphics::SetupWaveformGraphics(vector<Int_t> &WaveformLength)
 }
 
 
-void AAGraphics::PlotWaveforms(vector<vector<uint16_t> > &Waveforms, 
+void AAGraphics::PlotWaveforms(vector<vector<uint16_t> > &Waveforms,
 			       vector<Int_t> &WaveformLength)
 {
   Int_t NumGraphs = 0;
 
   Int_t NumDGChannels = AAVMEManager::GetInstance()->GetDGManager()->GetNumChannels();
-  
+
   for(int ch=0; ch<NumDGChannels; ch++){
-    
+
     if(!TheSettings->ChEnable[ch])
       continue;
-    
+
     // Efficienctly allocate the channel voltage into a vector<int>
     vector<Int_t> Voltage (Waveforms[ch].begin(), Waveforms[ch].end());
 
@@ -335,11 +335,11 @@ void AAGraphics::PlotWaveforms(vector<vector<uint16_t> > &Waveforms,
       Time.resize(WaveformLength[ch]);
       iota(begin(Time), end(Time), 0);
     }
-    
+
     // Prevent plotting if there is no waveform values to plot
     if(Voltage.size() == 0)
       return;
-    
+
     // Set the horiz. and vert. min/max ranges of the waveform.  Note
     // the max value is the max digitizer bit value in units of ADC
 
@@ -347,20 +347,20 @@ void AAGraphics::PlotWaveforms(vector<vector<uint16_t> > &Waveforms,
     XMax = MaxWaveformLength * TheSettings->HorizontalSliderMax;
     WaveformGraphs[ch]->GetXaxis()->SetRangeUser(XMin, XMax);
 
-    (TheSettings->DisplayXAxisInLog) ? 
+    (TheSettings->DisplayXAxisInLog) ?
       gPad->SetLogx(true) : gPad->SetLogx(false);
-    
+
     Int_t AbsoluteMax = AAVMEManager::GetInstance()->GetDGManager()->GetMaxADCBit();
     YMin = AbsoluteMax * TheSettings->VerticalSliderMin;
     YMax = AbsoluteMax * TheSettings->VerticalSliderMax;
-    
+
     if(TheSettings->DisplayYAxisInLog){
       if(YMin == 0) YMin = 1;
       gPad->SetLogy(true);
     }
     else
       gPad->SetLogy(false);
-    
+
     // The WaveformGraphAxes_H object creates the X and Y axes upon
     // which the TGraph waveform objects are plotted. A TH1F is used
     // because (a)the TAxis::SetRangeUser() methods do NOT appear to
@@ -371,7 +371,7 @@ void AAGraphics::PlotWaveforms(vector<vector<uint16_t> > &Waveforms,
     // previously). This should have the effect of substantially
     // boosting acquisition performance at high rates due to decreased
     // CPU/memory time spent plotting waveforms.
-    
+
     // If this is the first channel being drawn, dynamically set the X
     // and Y ranges based on the horizontal and vertical double slider
     // positions and draw the axes
@@ -392,17 +392,17 @@ void AAGraphics::PlotWaveforms(vector<vector<uint16_t> > &Waveforms,
       DrawOptions += "PL";
 
     // Draw the graph with the new time/voltage values
-    WaveformGraphs[ch]->DrawGraph(WaveformLength[ch], 
-				  &Time[0], 
+    WaveformGraphs[ch]->DrawGraph(WaveformLength[ch],
+				  &Time[0],
 				  &Voltage[0],
 				  DrawOptions);
-    
+
     NumGraphs++;
   }
-  
+
   if(TheSettings->DisplayLegend)
     Waveform_LG->Draw();
-  
+
   (TheSettings->DisplayGrid) ? gPad->SetGrid(true, true) : gPad->SetGrid(false, false);
 }
 
@@ -415,7 +415,7 @@ void AAGraphics::DrawWaveformGraphics(vector<double> &BaselineValue,
 				      vector<int> &PSDTailAbsStop)
 {
   for(int ch=0; ch<TheSettings->ChEnable.size(); ch++){
-    
+
     if(!TheSettings->ChEnable[ch])
       continue;
 
@@ -423,7 +423,7 @@ void AAGraphics::DrawWaveformGraphics(vector<double> &BaselineValue,
 
       // STD firmware: trigger value is in absolute ADC units
       // PSD firmware: trigger value relative to baseline in ADC units
-      
+
       Double_t Trigger = 0.;
       if(TheSettings->PSDFirmware){
 	if(TheSettings->ChPosPolarity[ch])
@@ -433,7 +433,7 @@ void AAGraphics::DrawWaveformGraphics(vector<double> &BaselineValue,
       }
       else
 	Trigger = TheSettings->ChTriggerThreshold[ch];
-      
+
       Trigger_L[ch]->DrawLine(XMin, Trigger, XMax, Trigger);
 
       if(TheSettings->PSDFirmware){
@@ -443,16 +443,16 @@ void AAGraphics::DrawWaveformGraphics(vector<double> &BaselineValue,
 				   YMax);
       }
     }
-    
+
     if(TheSettings->DisplayBaselineBox){
       Double_t BaselineWidth = (YMax-YMin)*0.03;
-      
+
       Baseline_B[ch]->DrawBox(BaselineStart[ch],
 			      BaselineValue[ch] - BaselineWidth,
 			      BaselineStop[ch],
 			      BaselineValue[ch] + BaselineWidth);
     }
-    
+
     if(TheSettings->DisplayPSDLimits){
 
       PSDTotal_B[ch]->DrawBox(PSDTotalAbsStart[ch],
@@ -465,7 +465,7 @@ void AAGraphics::DrawWaveformGraphics(vector<double> &BaselineValue,
 				YMin,
 				PeakPosition[ch],
 				YMax);
-      
+
       PSDTail_L0[ch]->DrawLine(PSDTailAbsStart[ch],
 			       YMin,
 			       PSDTailAbsStart[ch],
@@ -497,7 +497,7 @@ void AAGraphics::SetupSpectrumGraphics()
     Title = TheSettings->DisplayTitle;
     XTitle = TheSettings->DisplayXTitle;
     YTitle = TheSettings->DisplayYTitle;
-    
+
     XSize = TheSettings->DisplayXTitleSize;
     XOffset = TheSettings->DisplayXTitleOffset;
 
@@ -506,9 +506,9 @@ void AAGraphics::SetupSpectrumGraphics()
   }
   else{
     Title = "Pulse spectrum";
-    
+
     Int_t Channel = TheSettings->SpectrumChannel;
-    
+
     Bool_t Calibrated = AAAcquisitionManager::GetInstance()->GetCalibrationEnable(Channel);
 
     if(Calibrated){
@@ -522,7 +522,7 @@ void AAGraphics::SetupSpectrumGraphics()
         XTitle = "Pulse area [ADC]";
     }
     YTitle = "Counts";
-    
+
     XSize = YSize = 0.05;
     XOffset = 1.1;
     YOffset = 1.2;
@@ -540,7 +540,7 @@ void AAGraphics::PlotSpectrum(TH1F *Spectrum_H)
   Spectrum_H->SetMarkerColor(ChColor[Channel]);
   Spectrum_H->SetMarkerSize(0.75);
   Spectrum_H->SetFillColor(ChColor[Channel]);
-  
+
   if(TheSettings->SpectrumWithLine){
     Spectrum_H->SetFillStyle(0);
     Spectrum_H->Draw("");
@@ -550,33 +550,33 @@ void AAGraphics::PlotSpectrum(TH1F *Spectrum_H)
   else
     Spectrum_H->Draw("B");
 
-  // Set spectrum axes range and lin/log 
+  // Set spectrum axes range and lin/log
 
   XMin = TheSettings->SpectrumMaxBin * TheSettings->HorizontalSliderMin;
   XMax = TheSettings->SpectrumMaxBin * TheSettings->HorizontalSliderMax;
   Spectrum_H->GetXaxis()->SetRangeUser(XMin, XMax);
-  
-  (TheSettings->DisplayXAxisInLog) ? 
+
+  (TheSettings->DisplayXAxisInLog) ?
     gPad->SetLogx(true) : gPad->SetLogx(false);
-  
+
   Int_t AbsoluteMax = Spectrum_H->GetBinContent(Spectrum_H->GetMaximumBin()) * 1.05;
   YMin = AbsoluteMax * TheSettings->VerticalSliderMin;
   YMax = AbsoluteMax * TheSettings->VerticalSliderMax;
-  
+
   if(TheSettings->DisplayYAxisInLog){
     if(YMin == 0) YMin = 1;
     gPad->SetLogy(true);
   }
-  else 
+  else
     gPad->SetLogy(false);
-  
+
   Spectrum_H->SetMinimum(YMin);
   Spectrum_H->SetMaximum(YMax);
 
   // Set plot and axis title text properties
 
   Spectrum_H->SetTitle(Title.c_str());
-  
+
   Spectrum_H->GetXaxis()->SetTitle(XTitle.c_str());
   Spectrum_H->GetXaxis()->SetTitleSize(XSize);
   Spectrum_H->GetXaxis()->SetTitleOffset(XOffset);
@@ -589,14 +589,14 @@ void AAGraphics::PlotSpectrum(TH1F *Spectrum_H)
 
   (TheSettings->DisplayLegend) ? Spectrum_H->SetStats(true) : Spectrum_H->SetStats(false);
   (TheSettings->DisplayGrid) ? gPad->SetGrid(true, true) : gPad->SetGrid(false, false);
-  
+
   // If calibration is enabled the draw a vertical line corresponding
   // to the current pulse value selected by the triple slider pointer
 
   if(TheSettings->SpectrumCalibrationEnable){
     Double_t PulseValue = TheSettings->SpectrumMaxBin *
       TheSettings->HorizontalSliderPtr;
-    
+
     SpectrumCalibration_L->DrawLine(PulseValue,
 				    YMin,
 				    PulseValue,
@@ -612,10 +612,10 @@ void AAGraphics::SetupPSDHistogramGraphics()
     Title = TheSettings->DisplayTitle;
     XTitle = TheSettings->DisplayXTitle;
     YTitle = TheSettings->DisplayYTitle;
-    
+
     XSize = TheSettings->DisplayXTitleSize;
     XOffset = TheSettings->DisplayXTitleOffset;
-    
+
     YSize = TheSettings->DisplayYTitleSize;
     YOffset = TheSettings->DisplayYTitleOffset;
   }
@@ -626,7 +626,7 @@ void AAGraphics::SetupPSDHistogramGraphics()
       YTitle = "Tail integral [ADC]";
     else
       YTitle = "(Tail / Total) integrals [None]";
-    
+
     XSize = YSize = 0.05;
     XOffset = 1.1;
     YOffset = 1.2;
@@ -636,7 +636,7 @@ void AAGraphics::SetupPSDHistogramGraphics()
 void AAGraphics::PlotPSDHistogram(TH2F *PSDHistogram_H)
 {
   Int_t Channel = TheSettings->PSDChannel;
-  
+
   // Draw the PSDHistogram and prevent the user from inducing segfaults
   // upon moving the color axis
   PSDHistogram_H->Draw("COLZ");
@@ -644,14 +644,14 @@ void AAGraphics::PlotPSDHistogram(TH2F *PSDHistogram_H)
   TPaletteAxis *palette = (TPaletteAxis*)
     PSDHistogram_H->GetListOfFunctions()->FindObject("palette");
   palette->SetBit(TBox::kCannotMove);
-  
+
   XMin = TheSettings->PSDTotalMaxBin * TheSettings->HorizontalSliderMin;
   XMax = TheSettings->PSDTotalMaxBin * TheSettings->HorizontalSliderMax;
   PSDHistogram_H->GetXaxis()->SetRangeUser(XMin, XMax);
-  
-  (TheSettings->DisplayXAxisInLog) ? 
+
+  (TheSettings->DisplayXAxisInLog) ?
     gPad->SetLogx(true) : gPad->SetLogx(false);
-  
+
   YMin = TheSettings->PSDTailMaxBin * TheSettings->VerticalSliderMin;
   YMax = TheSettings->PSDTailMaxBin * TheSettings->VerticalSliderMax;
   PSDHistogram_H->GetYaxis()->SetRangeUser(YMin, YMax);
@@ -660,11 +660,11 @@ void AAGraphics::PlotPSDHistogram(TH2F *PSDHistogram_H)
     if(YMin == 0) YMin = 1;
     gPad->SetLogy(true);
   }
-  else 
+  else
     gPad->SetLogy(false);
 
   PSDHistogram_H->SetTitle(Title.c_str());
-  
+
   PSDHistogram_H->GetXaxis()->SetTitle(XTitle.c_str());
   PSDHistogram_H->GetXaxis()->SetTitleSize(XSize);
   PSDHistogram_H->GetXaxis()->SetTitleOffset(XOffset);
@@ -694,7 +694,7 @@ void AAGraphics::PlotCalibration(int Channel)
   TCanvas *CalibrationCanvas_C = new TCanvas("CalibrationCanvas_C",
 					     "Channel calibration curve",
 					     0, 0, 700, 500);
-  
+
   CalibrationCurve->SetTitle(Title.c_str());
   CalibrationCurve->GetXaxis()->SetTitle("Pulse unit [ADC]");
   CalibrationCurve->GetXaxis()->SetTitleSize(0.05);
@@ -708,7 +708,7 @@ void AAGraphics::PlotCalibration(int Channel)
   CalibrationCurve->SetMarkerSize(2);
   CalibrationCurve->SetMarkerStyle(22);
   CalibrationCurve->Draw("ALP");
-  
+
   CalibrationCanvas_C->Update();
 }
 
@@ -726,7 +726,7 @@ void AAGraphics::SetupRateGraphics()
     Title = TheSettings->DisplayTitle;
     XTitle = TheSettings->DisplayXTitle;
     YTitle = TheSettings->DisplayYTitle;
-    
+
     XSize = TheSettings->DisplayXTitleSize;
     XOffset = TheSettings->DisplayXTitleOffset;
 
@@ -737,15 +737,15 @@ void AAGraphics::SetupRateGraphics()
     Title = "Trigger rate";
     XTitle = "Run time [s]";
     YTitle = "Triggers/s";
-    
+
     XSize = YSize = 0.05;
     XOffset = 1.1;
     YOffset = 1.2;
   }
-  
+
   if (RateGraph)
     delete RateGraph;
- 
+
   // Create a new TGraph representing the rate plot
   RateGraph = new TGraph;
 
@@ -763,7 +763,7 @@ void AAGraphics::SetupRateGraphics()
     Title = TheSettings->DisplayTitle;
     XTitle = TheSettings->DisplayXTitle;
     YTitle = TheSettings->DisplayYTitle;
-    
+
     XSize = TheSettings->DisplayXTitleSize;
     XOffset = TheSettings->DisplayXTitleOffset;
 
@@ -772,12 +772,12 @@ void AAGraphics::SetupRateGraphics()
   }
   else{
     Title = "Trigger rate";
-    
+
     Int_t Channel = TheSettings->RateChannel;
 
     XTitle = "Run time [s]";
     YTitle = "Trigger rate [triggers/s]";
-    
+
     XSize = YSize = 0.05;
     XOffset = 1.1;
     YOffset = 1.2;
@@ -792,13 +792,13 @@ void AAGraphics::SetupRateGraphics()
 
   // Set the waveform title and axes properties
   RateGraphAxes_H->SetTitle(Title.c_str());
-  
+
   RateGraphAxes_H->GetXaxis()->SetTitle(XTitle.c_str());
   RateGraphAxes_H->GetXaxis()->SetTitleSize(XSize);
   RateGraphAxes_H->GetXaxis()->SetTitleOffset(XOffset);
   RateGraphAxes_H->GetXaxis()->SetLabelSize(XSize);
   RateGraphAxes_H->GetXaxis()->SetRangeUser(0, TheSettings->RateDisplayPeriod);
-  
+
   RateGraphAxes_H->GetYaxis()->SetTitle(YTitle.c_str());
   RateGraphAxes_H->GetYaxis()->SetTitleSize(YSize);
   RateGraphAxes_H->GetYaxis()->SetTitleOffset(YOffset);
@@ -841,19 +841,19 @@ void AAGraphics::PlotRate(Double_t tss)
   XMax = TheSettings->RateDisplayPeriod * TheSettings->HorizontalSliderMax + tss;
   RateGraph->GetXaxis()->SetRangeUser(XMin, XMax);
 
-  (TheSettings->DisplayXAxisInLog) ? 
+  (TheSettings->DisplayXAxisInLog) ?
     gPad->SetLogx(true) : gPad->SetLogx(false);
-  
+
   YMin = AbsoluteMax * TheSettings->VerticalSliderMin;
   YMax = AbsoluteMax * TheSettings->VerticalSliderMax;
-  
+
   if(TheSettings->DisplayYAxisInLog){
     if(YMin == 0) YMin = 1;
     gPad->SetLogy(true);
   }
   else
     gPad->SetLogy(false);
-  
+
   RateGraphAxes_H->Fill(XMax); // Force axis extension then clear the bin count
   RateGraphAxes_H->Reset();
   RateGraphAxes_H->GetXaxis()->SetRangeUser(XMin,XMax);

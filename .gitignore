@@ -2,9 +2,9 @@
 # date: 14 Jan 15
 # auth: Zach Hartwig
 # mail: hartwig@psfc.mit.edu
-# desc: List of files for git to completely ignore from repository 
+# desc: List of files for git to completely ignore from repository
 
-# General 
+# General
 *.o
 *.log
 *.cache
@@ -17,4 +17,8 @@ bin/*
 # Ignore all documentation transients and PDF
 doc/build/*
 doc/ADAQAcquisition_UsersGuide.pdf
+
+.vscode
+compile_commands.json
+.DS_Store
 

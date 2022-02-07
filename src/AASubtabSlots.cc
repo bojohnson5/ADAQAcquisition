@@ -4,7 +4,7 @@
 //                 Zachary Seth Hartwig : All rights reserved                  //
 //                                                                             //
 //      The ADAQAcquisition source code is licensed under the GNU GPL v3.0.    //
-//      You have the right to modify and/or redistribute this source code      //      
+//      You have the right to modify and/or redistribute this source code      //
 //      under the terms specified in the license, which may be found online    //
 //      at http://www.gnu.org/licenses or at $ADAQACQUISITION/License.txt.     //
 //                                                                             //
@@ -43,7 +43,7 @@ void AASubtabSlots::HandleCheckButtons()
   int ActiveID = ActiveButton->WidgetId();
 
   TI->SaveSettings();
-  
+
   switch(ActiveID){
 
   case DGTriggerCoincidenceEnable_CB_ID:
@@ -59,10 +59,10 @@ void AASubtabSlots::HandleCheckButtons()
     else
       TI->SetCalibrationWidgetState(false, kButtonDisabled);
     break;
-    
+
   case WaveformStorageEnable_CB_ID:
     break;
-    
+
   case DisplayTitlesEnable_CB_ID:
     if(ActiveButton->IsDown())
       TI->SetTitlesWidgetState(true, kButtonUp);
@@ -76,18 +76,18 @@ void AASubtabSlots::HandleCheckButtons()
 void AASubtabSlots::HandleComboBoxes(int ActiveID, int SelectedID)
 {
   AAVMEManager *TheVMEManager = AAVMEManager::GetInstance();
-  
+
   if(!TheVMEManager->GetVMEConnectionEstablished())
     return;
-  
+
   TI->SaveSettings();
-  
+
   switch(ActiveID){
-    
+
   case DGPSDMode_CBL_ID:
-    
+
     switch(SelectedID){
-      
+
     case 0: // PSD waveform only mode
       TI->DGPSDWaveformAnalysis_RB->SetState(kButtonDown);
       TI->DGPSDListAnalysis_RB->SetState(kButtonUp);
@@ -99,14 +99,14 @@ void AASubtabSlots::HandleComboBoxes(int ActiveID, int SelectedID)
       TI->DGPSDWaveformAnalysis_RB->SetState(kButtonUp);
       TI->DGPSDWaveformAnalysis_RB->SetState(kButtonDisabled);
       break;
-      
+
     case 2: // PSD list+waveform mode
       TI->DGPSDListAnalysis_RB->SetState(kButtonDown);
       TI->DGPSDWaveformAnalysis_RB->SetState(kButtonUp);
       break;
     }
     break;
-    
+
   case SpectrumChannel_CBL_ID:{
 
     // In order to ensure that the calibration set point combo box
@@ -116,7 +116,7 @@ void AASubtabSlots::HandleComboBoxes(int ActiveID, int SelectedID)
 
     // Get the number of calibration points for the current histogram
     // (SelectedID == histogram channel for this combo box)
-    
+
     int LastPointIndex = AAAcquisitionManager::GetInstance()->
       GetCalibrationDataStruct(SelectedID).PointID.size();
 
@@ -153,24 +153,24 @@ void AASubtabSlots::HandleComboBoxes(int ActiveID, int SelectedID)
 
 
   case SpectrumCalibrationPoint_CBL_ID:{
-    
-    int Channel = TI->SpectrumChannel_CBL->GetComboBox()->GetSelected();    
+
+    int Channel = TI->SpectrumChannel_CBL->GetComboBox()->GetSelected();
 
     CalibrationDataStruct Cal = AAAcquisitionManager::GetInstance()->
       GetCalibrationDataStruct(Channel);
-    
+
     int Size = Cal.PointID.size();
-    
+
     if(SelectedID <= (Size-1)){
-      
+
       double Energy = Cal.Energy.at(SelectedID);
       double PulseUnit = Cal.PulseUnit.at(SelectedID);
-      
+
       TI->SpectrumCalibrationEnergy_NEL->GetEntry()->SetNumber(Energy);
       TI->SpectrumCalibrationPulseUnit_NEL->GetEntry()->SetNumber(PulseUnit);
 
       double Value = Energy / TI->SpectrumMaxBin_NEL->GetEntry()->GetNumber();
-      
+
       TI->DisplayHorizontalScale_THS->SetPointerPosition(Value);
     }
     else{
@@ -190,11 +190,11 @@ void AASubtabSlots::HandleNumberEntries()
   Int_t ActiveID = ActiveEntry->WidgetId();
 
   TI->SaveSettings();
-  
+
   AAVMEManager *TheVMEManager = AAVMEManager::GetInstance();
 
   switch(ActiveID){
-    
+
   case SpectrumCalibrationEnergy_NEL_ID:
     break;
 
@@ -204,10 +204,10 @@ void AASubtabSlots::HandleNumberEntries()
       Value = TI->SpectrumCalibrationEnergy_NEL->GetEntry()->GetNumber();
     else
       Value = TI->SpectrumCalibrationPulseUnit_NEL->GetEntry()->GetNumber();
-    
+
     // Normalize value for slider position setting from 0 to 1
     Value /= TI->SpectrumMaxBin_NEL->GetEntry()->GetNumber();
-    
+
     TI->DisplayHorizontalScale_THS->SetPointerPosition(Value);
     break;
   }
@@ -223,36 +223,36 @@ void AASubtabSlots::HandleTextButtons()
   TI->SaveSettings();
 
   AAVMEManager *TheVMEManager = AAVMEManager::GetInstance();
-  
+
   AAAcquisitionManager *TheACQManager = AAAcquisitionManager::GetInstance();
-  
+
   switch(ActiveID){
 
     //////////////////
-    // Acquisition tab 
+    // Acquisition tab
 
   case AQTimerStart_TB_ID:{
-    
+
     if(TI->AQStartStop_TB->GetString() != "Acquiring")
       break;
-    
+
     if(ActiveButton->GetString() == "Start timer"){
-      
+
       // Set the graphical attributes of the text button
       ActiveButton->SetBackgroundColor(TI->ColorManager->Number2Pixel(TI->ButtonBackColorOn));
       ActiveButton->SetForegroundColor(TI->ColorManager->Number2Pixel(TI->ButtonForeColor));
       ActiveButton->SetText("Waiting ...");
-      
+
       // Get the start time (i.e. now)
       TheACQManager->SetAcquisitionTimeStart(time(NULL));
-      
+
       // Get the stop time (i.e. amount of time to run in seconds)
       TheACQManager->SetAcquisitionTimeStop(TI->AQTime_NEL->GetEntry()->GetNumber());
-      
+
       // Set the bool that will trigger the check of the timer against
       // the current time within the acquisition loop in RunDGScope()
       TheACQManager->SetAcquisitionTimerEnable(true);
-      
+
       // Configure such that when an ADAQ file has been opened and the
       // AQ timer is running waveform data is being stored
       if(TheACQManager->GetADAQFileIsOpen() and
@@ -263,14 +263,14 @@ void AASubtabSlots::HandleTextButtons()
     }
     break;
   }
-    
+
   case AQTimerAbort_TB_ID:{
     if(TheACQManager->GetAcquisitionEnable() and
        TheACQManager->GetAcquisitionTimerEnable())
       TheACQManager->StopAcquisition();
     break;
   }
-    
+
 
   case CheckBufferStatus_TB_ID:{
 
@@ -279,7 +279,7 @@ void AASubtabSlots::HandleTextButtons()
     bool BufferStatus[DGChannels];
     for(int ch=0; ch<DGChannels; ch++)
       BufferStatus[ch] = false;
-    
+
     TheVMEManager->GetDGManager()->GetChannelBufferStatus(BufferStatus);
 
     Double_t BufferLevel = 0.;
@@ -287,10 +287,10 @@ void AASubtabSlots::HandleTextButtons()
       TheVMEManager->GetDGManager()->GetSTDBufferLevel(BufferLevel);
     else if(TI->TheSettings->PSDFirmware)
       TheVMEManager->GetDGManager()->GetPSDBufferLevel(BufferLevel);
-    
+
     TI->DGBufferStatus_PB->Reset();
     TI->DGBufferStatus_PB->Increment(BufferLevel*100);
-    
+
     if(BufferLevel > 0.90){
       TI->DGBufferStatus_PB->SetBarColor(TI->ColorManager->Number2Pixel(TI->ButtonBackColorOff));
       TI->DGBufferStatus_PB->SetForegroundColor(TI->ColorManager->Number2Pixel(TI->ButtonForeColor));
@@ -314,27 +314,27 @@ void AASubtabSlots::HandleTextButtons()
 
     // Get the calibration point to be set
     uint SetPoint = TI->SpectrumCalibrationPoint_CBL->GetComboBox()->GetSelected();
-    
+
     // Get the energy of the present calibration point
     double Energy = TI->SpectrumCalibrationEnergy_NEL->GetEntry()->GetNumber();
-    
+
     // Get the pulse unit value of the present calibration point
     double PulseUnit = TI->SpectrumCalibrationPulseUnit_NEL->GetEntry()->GetNumber();
-    
+
     TheACQManager->AddCalibrationPoint(Channel, SetPoint, Energy, PulseUnit);
-    
+
     TI->UpdateAfterCalibrationPointAdded(SetPoint);
-    
+
     break;
   }
 
-    
+
   case SpectrumCalibrationCalibrate_TB_ID:{
-    
+
     int Channel = TI->SpectrumChannel_CBL->GetComboBox()->GetSelected();
 
     bool CalibrationEnable = TheACQManager->EnableCalibration(Channel);
-    
+
     if(CalibrationEnable){
       TI->SpectrumCalibrationCalibrate_TB->SetText("Calibrated");
       TI->SpectrumCalibrationCalibrate_TB->SetBackgroundColor(TI->ColorManager->Number2Pixel(TI->ButtonBackColorOn));
@@ -342,17 +342,17 @@ void AASubtabSlots::HandleTextButtons()
     }
     else
       {}
-    
+
     break;
   }
-    
-    
+
+
   case SpectrumCalibrationPlot_TB_ID:{
 
     int Channel = TI->SpectrumChannel_CBL->GetComboBox()->GetSelected();
-    
+
     bool CalEnable = TheACQManager->GetCalibrationEnable(Channel);
-    
+
     if(CalEnable)
       AAGraphics::GetInstance()->PlotCalibration(Channel);
     else{
@@ -366,7 +366,7 @@ void AASubtabSlots::HandleTextButtons()
 
     // Get the current channel being histogrammed in DGScope
     int Channel = TI->SpectrumChannel_CBL->GetComboBox()->GetSelected();
-    
+
     bool CalibrationReset = TheACQManager->ResetCalibration(Channel);
 
     if(CalibrationReset){
@@ -382,37 +382,37 @@ void AASubtabSlots::HandleTextButtons()
     }
     else
       {}
-    
+
     break;
   }
 
-    
+
   case SpectrumCalibrationLoad_TB_ID:{
-    
+
     int Channel = TI->SpectrumChannel_CBL->GetComboBox()->GetSelected();
-    
+
     const char *FileTypes[] = {"ADAQ calibration file", "*.acal",
 			       "All",                   "*.*",
 			       0,0};
-    
+
     EFileDialogMode DialogType = kFDOpen;
-    
+
     string FileName = TI->CreateFileDialog(FileTypes, DialogType);
-    
+
     if(FileName == "NULL"){
     }
     else{
-      
+
       // Reset any preexisting calibrations
       TI->SpectrumCalibrationReset_TB->Clicked();
 
       int NumPoints = 0;
       bool CalibrationLoaded = TheACQManager->LoadCalibration(Channel, FileName, NumPoints);
-      
+
       if(CalibrationLoaded){
 	for(int point=0; point<NumPoints; point++)
 	  TI->UpdateAfterCalibrationPointAdded(point);
-	
+
 	TI->SpectrumCalibrationCalibrate_TB->Clicked();
       }
       else{
@@ -420,8 +420,8 @@ void AASubtabSlots::HandleTextButtons()
     }
     break;
   }
-    
-    
+
+
   case SpectrumCalibrationWrite_TB_ID:{
 
     const char *FileTypes[] = {"ADAQ calibration file", "*.acal",
@@ -434,7 +434,7 @@ void AASubtabSlots::HandleTextButtons()
     }
     else{
       int Channel = TI->SpectrumChannel_CBL->GetComboBox()->GetSelected();
-      
+
       TheACQManager->WriteCalibration(Channel, FileName);
     }
     break;
@@ -442,29 +442,29 @@ void AASubtabSlots::HandleTextButtons()
 
 
   case WaveformFileName_TB_ID:{
-    
+
     const char *FileTypes[] = {"ADAQ ROOT file","*.adaq.root",
 			       0, 0};
-    
+
     WaveformFileName = TI->CreateFileDialog(FileTypes, kFDOpen);
-    
+
     if(WaveformFileName == "NULL")
       WaveformFileName = "DefaultData.adaq.root";
-    
+
     string FileNameNoPath = WaveformFileName;
-    
+
     size_t Found = FileNameNoPath.find_last_of("/");
     if(Found != string::npos)
       FileNameNoPath = FileNameNoPath.substr(Found+1, FileNameNoPath.size());
-    
+
     TI->WaveformFileName_TEL->GetEntry()->SetText(FileNameNoPath.c_str());
-    
+
     break;
   }
 
-    
+
   case WaveformCreateFile_TB_ID:{
-    
+
     // First call a "special" save of widget settings to account for
     // those widgets that can remain active during acquisition to
     // account for settings that may have changed since acquisition
@@ -474,10 +474,10 @@ void AASubtabSlots::HandleTextButtons()
 
     // Second create the ADAQ file now that widget states have been
     // saved correctly
-    
+
     TheACQManager->CreateADAQFile(WaveformFileName);
 
-    
+
     // Finally set the widget states appropriately for the time that
     // data is being readout into the ADAQ file
 
@@ -496,7 +496,7 @@ void AASubtabSlots::HandleTextButtons()
     break;
   }
 
-   
+
   case WaveformCommentFile_TB_ID:{
     // Create a new custome editor for creating ADAQ file comments
     AAEditor *Editor = new AAEditor(TI,500,500);
@@ -514,24 +514,24 @@ void AASubtabSlots::HandleTextButtons()
     // acquisition manager. From there, it will be passed to the
     // ADAQReadoutManager and saved properly into the ADAQ file
     TheACQManager->SetADAQFileComment(Editor->GetEditorText());
-    
+
     delete Editor;
-    
+
     break;
   }
-    
-    
+
+
   case WaveformCloseFile_TB_ID:{
 
     // Do not let the use close/write the ADAQ file if data is still
     // be actively acquired. This forces the user to stop taking data
     // and then properly close/write the ADAQ file.
-    
+
     if(TI->WaveformStorageEnable_CB->IsDown())
       break;
-    
+
     TheACQManager->CloseADAQFile();
-    
+
     if(!TheACQManager->GetADAQFileIsOpen()){
       TI->AQTime_NEL->GetEntry()->SetState(true);
       TI->WaveformFileName_TB->SetState(kButtonUp);
@@ -547,75 +547,75 @@ void AASubtabSlots::HandleTextButtons()
       TI->WaveformStoreEnergyData_CB->SetState(kButtonUp);
       TI->WaveformStorePSDData_CB->SetState(kButtonUp);
     }
-    
+
     break;
   }
 
 
   case ObjectOutputFileName_TB_ID:{
-    
+
     // Set the allowable file type extensions. These will be used to
     // determine the format of the data output to file
     const char *FileTypes[] = {"ROOT File"             , "*.root",
 			       "Space-separated format", "*.dat",
 			       "Comma-separated format", "*.csv",
 			       0, 0};
-    
+
     ObjectFileName = TI->CreateFileDialog(FileTypes, kFDOpen);
-    
+
     if(ObjectFileName == "NULL"){
     }
     else{
       string FileNameNoPath = ObjectFileName;
-      
+
       size_t Found = FileNameNoPath.find_last_of("/");
       if(Found != string::npos)
 	FileNameNoPath = FileNameNoPath.substr(Found+1, FileNameNoPath.size());
-      
+
       TI->ObjectOutputFileName_TEL->GetEntry()->SetText(FileNameNoPath.c_str());
     }
     break;
   }
-    
-    
+
+
   case ObjectSave_TB_ID:{
-    
+
     if(TI->ObjectSaveWithTimeExtension_CB->IsDown()){
 
       size_t Found0 = ObjectFileName.find_first_of(".");
       size_t Found1 = ObjectFileName.find_last_of(".");
-      
+
       if(Found1 != string::npos){
 	string FileName = ObjectFileName.substr(0, Found0);
 	string FileExtension = ObjectFileName.substr(Found1, string::npos);
-	
+
 	time_t Time = time(NULL);
-	
+
 	stringstream SS;
 	SS << "." << Time;
 	string TimeString = SS.str();
-	
+
 	ObjectFileName = FileName + TimeString + FileExtension;
       }
     }
-    
+
     if(TI->WaveformOutput_RB->IsDown())
-      cout << "\nAASubtabSlots::HandleTextButtons() : Waveform output is not yet implemented!\n"                                                                              
-	   << endl; 
-    
+      cout << "\nAASubtabSlots::HandleTextButtons() : Waveform output is not yet implemented!\n"
+	   << endl;
+
     else if(TI->SpectrumOutput_RB->IsDown())
       AAAcquisitionManager::GetInstance()->SaveObjectData("Spectrum",
 							  ObjectFileName);
-    
+
     else if(TI->PSDHistogramOutput_RB->IsDown())
       AAAcquisitionManager::GetInstance()->SaveObjectData("PSDHistogram",
 							  ObjectFileName);
     break;
   }
-    
-    
+
+
   case CanvasFileName_TB_ID:{
-    
+
     const char *FileTypes[] = {"EPS file", "*.eps",
 			       "PS file",  "*.ps",
 			       "PDF file", "*.pdf",
@@ -624,40 +624,40 @@ void AASubtabSlots::HandleTextButtons()
 			       0, 0};
 
     CanvasFileName = TI->CreateFileDialog(FileTypes, kFDOpen);
-    
+
     if(CanvasFileName == "NULL"){
     }
     else{
       string FileNameNoPath = CanvasFileName;
-      
+
       size_t Found = FileNameNoPath.find_last_of("/");
       if(Found != string::npos)
 	FileNameNoPath = FileNameNoPath.substr(Found+1, FileNameNoPath.size());
-      
+
       TI->CanvasFileName_TEL->GetEntry()->SetText(FileNameNoPath.c_str());
     }
 
     break;
   }
 
-    
+
   case CanvasSave_TB_ID:{
-    
+
     size_t Found0 = CanvasFileName.find_first_of(".");
     size_t Found1 = CanvasFileName.find_last_of(".");
-    
+
     if(Found1 != string::npos){
-      
+
       string FileName = CanvasFileName.substr(0, Found0);
       string FileExtension = CanvasFileName.substr(Found1, string::npos);
-      
+
       if(TI->CanvasSaveWithTimeExtension_CB->IsDown()){
 	time_t Time = time(NULL);
-	
+
 	stringstream SS;
 	SS << "." << Time;
 	string TimeString = SS.str();
-	
+
 	CanvasFileName = FileName + TimeString + FileExtension;
       }
       TI->DisplayCanvas_EC->GetCanvas()->Update();
@@ -668,7 +668,7 @@ void AASubtabSlots::HandleTextButtons()
   }
   }
 }
-  
+
 
 void AASubtabSlots::HandleRadioButtons()
 {
@@ -676,7 +676,7 @@ void AASubtabSlots::HandleRadioButtons()
   int ActiveID = ActiveButton->WidgetId();
 
   TI->SaveSettings();
-  
+
   switch(ActiveID){
 
   case AQWaveform_RB_ID:
@@ -689,21 +689,21 @@ void AASubtabSlots::HandleRadioButtons()
     TI->DisplayHorizontalScale_THS->SetPosition(0,1);
     TI->DisplayVerticalScale_DVS->SetPosition(0,1);
     break;
-    
+
   case DGPSDListAnalysis_RB_ID:
     if(TI->DGPSDListAnalysis_RB->IsDown() and
        TI->DGPSDMode_CBL->GetComboBox()->GetSelected() != 1)
       TI->DGPSDWaveformAnalysis_RB->SetState(kButtonUp);
     break;
-    
+
   case DGPSDWaveformAnalysis_RB_ID:
     if(TI->DGPSDWaveformAnalysis_RB->IsDown())
       TI->DGPSDListAnalysis_RB->SetState(kButtonUp);
     break;
-    
+
   case SpectrumPulseHeight_RB_ID:
   case SpectrumPulseArea_RB_ID:
-    
+
     TI->SpectrumLLD_NEL->GetEntry()->SetNumber(TI->TheSettings->SpectrumMinBin);
     TI->SpectrumULD_NEL->GetEntry()->SetNumber(TI->TheSettings->SpectrumMaxBin);
     break;
@@ -712,37 +712,37 @@ void AASubtabSlots::HandleRadioButtons()
     if(TI->PSDYAxisTail_RB->IsDown())
       TI->PSDYAxisTailTotal_RB->SetState(kButtonUp);
     break;
-    
+
   case PSDYAxisTailTotal_RB_ID:
     if(TI->PSDYAxisTailTotal_RB->IsDown())
       TI->PSDYAxisTail_RB->SetState(kButtonUp);
     break;
-    
+
   case DrawWaveformWithLine_RB_ID:
     TI->DrawWaveformWithMarkers_RB->SetState(kButtonUp);
     TI->DrawWaveformWithBoth_RB->SetState(kButtonUp);
     break;
-    
+
   case DrawWaveformWithMarkers_RB_ID:
     TI->DrawWaveformWithLine_RB->SetState(kButtonUp);
     TI->DrawWaveformWithBoth_RB->SetState(kButtonUp);
     break;
-    
+
   case DrawWaveformWithBoth_RB_ID:
     TI->DrawWaveformWithLine_RB->SetState(kButtonUp);
     TI->DrawWaveformWithMarkers_RB->SetState(kButtonUp);
     break;
-    
+
   case DrawSpectrumWithLine_RB_ID:
     TI->DrawSpectrumWithMarkers_RB->SetState(kButtonUp);
     TI->DrawSpectrumWithBars_RB->SetState(kButtonUp);
     break;
-    
+
   case DrawSpectrumWithMarkers_RB_ID:
     TI->DrawSpectrumWithLine_RB->SetState(kButtonUp);
     TI->DrawSpectrumWithBars_RB->SetState(kButtonUp);
     break;
-    
+
   case DrawSpectrumWithBars_RB_ID:
     TI->DrawSpectrumWithLine_RB->SetState(kButtonUp);
     TI->DrawSpectrumWithMarkers_RB->SetState(kButtonUp);

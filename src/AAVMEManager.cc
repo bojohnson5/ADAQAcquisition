@@ -145,14 +145,14 @@ bool AAVMEManager::ProgramDigitizers()
       DGMgr->SetChannelTriggerThreshold(ch, TheSettings->ChTriggerThreshold[ch]);
       
       if(TheSettings->ChPosPolarity[ch])
-	DGMgr->SetChannelPulsePolarity(ch, CAEN_DGTZ_PulsePolarityPositive);
+        DGMgr->SetChannelPulsePolarity(ch, CAEN_DGTZ_PulsePolarityPositive);
       else
-	DGMgr->SetChannelPulsePolarity(ch, CAEN_DGTZ_PulsePolarityNegative);
+        DGMgr->SetChannelPulsePolarity(ch, CAEN_DGTZ_PulsePolarityNegative);
     
       if(TheSettings->ZeroSuppressionEnable){
-	DGMgr->SetZSMode("ZLE");
+        DGMgr->SetZSMode("ZLE");
 	
-	DGMgr->SetZLEChannelSettings(ch,
+        DGMgr->SetZLEChannelSettings(ch,
 				     TheSettings->ChZLEThreshold[ch],
 				     TheSettings->ChZLEBackward[ch],
 				     TheSettings->ChZLEForward[ch],
