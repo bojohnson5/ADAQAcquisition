@@ -142,7 +142,7 @@ void AAInterface::BuildPrimaryFrames()
   if(VersionString == "Development")
     TitleString = "ADAQAcquisition (Development version)               Fear is the mind-killer.";
   else
-    TitleString = "ADAQAcquisition (Production version " + VersionString + ")               Fear is the mind-killer.";
+    TitleString = "ADAQAcquisition (Production version " + VersionString + ")    Life before death, strength before weakness, journey before destination.";
   SetWindowName(TitleString.c_str());
 
   // Set the ain window size
