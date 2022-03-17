@@ -411,6 +411,16 @@ void AAAcquisitionManager::StartAcquisition()
   // The data acquisition loop //
   ///////////////////////////////
 
+  // Display acquisition control register 0x8100
+  uint32_t acq_contr_reg;
+  DGManager->GetRegisterValue(0x8100, &acq_contr_reg);
+  cout << "Register 0x8100: " << acq_contr_reg << endl;
+
+  // Display time over/under threshold register 0x1n84
+  uint32_t ov_und_reg;
+  DGManager->GetRegisterValue(0x1084, &ov_und_reg);
+  cout << "Register 0x1084: " << ov_und_reg << endl;
+
   while(AcquisitionEnable){
 
     // Handle the acquisition loop in a separate ROOT thread
