@@ -417,9 +417,10 @@ void AAAcquisitionManager::StartAcquisition()
   cout << "Register 0x8100: " << acq_contr_reg << endl;
 
   // Display time over/under threshold register 0x1n84
-  uint32_t ov_und_reg;
-  DGManager->GetRegisterValue(0x1084, &ov_und_reg);
-  cout << "Register 0x1084: " << ov_und_reg << endl;
+  // uint32_t ov_und_reg;
+  // DGManager->GetRegisterValue(0x1084, &ov_und_reg);
+  // cout << "Register 0x1084: " << ov_und_reg << endl;
+  /* It looks like this is always set to 0. */
 
   while(AcquisitionEnable){
 
