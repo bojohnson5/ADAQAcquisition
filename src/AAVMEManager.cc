@@ -121,7 +121,6 @@ Int_t AAVMEManager::InitializeHighVoltage()
 
 bool AAVMEManager::ProgramDigitizers()
 {
-  cout << "Programming digitizers\n";
   DGMgr->Reset();
 
   uint32_t DGNumChEnabled = 0;
@@ -258,7 +257,6 @@ bool AAVMEManager::ProgramDigitizers()
   switch(TheSettings->AcquisitionControl){
 
   case 0: // Standard (software controlled)
-    cout << "Setting Software control\n";
     DGMgr->SetAcquisitionControl("Software");
     break;
 
