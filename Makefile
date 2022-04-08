@@ -1,19 +1,19 @@
 #********************************************************************
 #
-#  name: Makefile                  
+#  name: Makefile
 #  date: 26 Jan 15
-#  auth: Zach Hartwig              
+#  auth: Zach Hartwig
 #  mail: hartwig@psfc.mit.edu
 #
 #  desc: GNU makefile for building the ADAQAcquisition binary
 #
 #  dpnd: The build system requires the following dependencies:
-#        -- ROOT 
+#        -- ROOT
 #        -- ADAQ libraries (ADAQControl, ADAQReadout)
 #        -- Boost libraries (boost-thread)
-# 
+#
 #  To build the binary
-#  $ make 
+#  $ make
 #
 #  To clean the bin/ and build/ directories
 #  $ make clean
@@ -29,7 +29,7 @@ ROOTMAKE:=$(ROOTSYS)/Makefile.arch
 include $(ROOTMAKE)
 
 # Enable C++11 features
-CXXFLAGS += -std=c++17
+CXXFLAGS += -std=c++11
 
 # Specify the the binary, build, and source directories
 BUILDDIR = build
@@ -71,7 +71,7 @@ TARGET = $(BINDIR)/ADAQAcquisition
 #*************************#
 # Rules to build the binary
 
-$(TARGET) : $(OBJS) 
+$(TARGET) : $(OBJS)
 	@echo -e "\nBuilding $@ ..."
 	$(CXX) -g -o $@ $^ $(LDFLAGS) $(ROOTGLIBS)
 	@echo -e "\n$@ build is complete!\n"
@@ -95,7 +95,7 @@ $(BUILDDIR)/ADAQAcquisitionDict.cc : $(INCLS) $(INCLDIR)/RootLinkDef.h
 	@cp $(BUILDDIR)/*.pcm $(BINDIR)
 
 # Clean the directory of all build files and binaries
-.PHONY: 
+.PHONY:
 clean:
 	@echo -e "\nCleaning up the build and binary ..."
 	rm -f $(BUILDDIR)/*.o *.d $(BUILDDIR)/*Dict.* $(TARGET)
